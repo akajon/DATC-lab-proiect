@@ -14,13 +14,9 @@ type repositoryImpl struct {
 }
 
 func (r repositoryImpl) Create(ctx context.Context, category, name, description string, grade int) (*CreateDangerResponse, error) {
-	err := r.db.PingContext(ctx)
-	if err != nil {
-		return nil, err
-	}
-
 	var id int
-	err = r.db.QueryRow(`INSERT INTO dbo.dangers (category, name, description, grade) OUTPUT inserted.danger_id
+
+	err := r.db.QueryRowContext(ctx, `INSERT INTO dbo.dangers (category, name, description, grade) OUTPUT inserted.danger_id
 							   VALUES (@category, @name, @description, @grade)`,
 		sql.Named("category", category),
 		sql.Named("name", name),
@@ -35,12 +31,8 @@ func (r repositoryImpl) Create(ctx context.Context, category, name, description 
 }
 
 func (r repositoryImpl) Delete(ctx context.Context, dangerId int) error {
-	err := r.db.PingContext(ctx)
-	if err != nil {
-		return err
-	}
 
-	_, err = r.db.ExecContext(ctx, "DELETE FROM dangers WHERE danger_id = @danger_id", sql.Named("danger_id", dangerId))
+	_, err := r.db.ExecContext(ctx, "DELETE FROM dangers WHERE danger_id = @danger_id", sql.Named("danger_id", dangerId))
 
 	return err
 }

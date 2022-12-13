@@ -15,13 +15,9 @@ type repositoryImpl struct {
 }
 
 func (r repositoryImpl) Create(ctx context.Context, firstName, lastName, email, hashedPassword, role string, taxReduction int, deletionDate *time.Time) (*CreateUserResponse, error) {
-	err := r.db.PingContext(ctx)
-	if err != nil {
-		return nil, err
-	}
-
 	var id int
-	err = r.db.QueryRow(`INSERT INTO dbo.users (first_name, last_name, email, passw, tax_reduction, rol, deletion_date) OUTPUT inserted.user_id
+
+	err := r.db.QueryRowContext(ctx, `INSERT INTO dbo.users (first_name, last_name, email, passw, tax_reduction, rol, deletion_date) OUTPUT inserted.user_id
 						VALUES (@first_name, @last_name, @email, @passw, @tax_reduction, @rol, @deletion_date)`,
 		sql.Named("first_name", firstName),
 		sql.Named("last_name", lastName),
@@ -50,14 +46,10 @@ func (r repositoryImpl) Create(ctx context.Context, firstName, lastName, email, 
 }
 
 func (r repositoryImpl) UpdateDeleteDate(ctx context.Context, userId int, deleteDate time.Time) (*UpdateDeleteDateResponse, error) {
-	err := r.db.PingContext(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	_, err = r.db.Exec(`UPDATE dbo.users SET deletion_date = @deletion_date where user_id = @user_id`,
+	_, err := r.db.ExecContext(ctx, `UPDATE dbo.users SET deletion_date = @deletion_date where user_id = @user_id`,
 		sql.Named("deletion_date", deleteDate),
 		sql.Named("user_id", userId))
+
 	if err != nil {
 		return nil, err
 	}
