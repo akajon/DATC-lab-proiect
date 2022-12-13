@@ -12,3 +12,7 @@ type CreateDangerRequest struct {
 	Description string
 	Grade       int
 }
+
+type DeleteDangerRequest struct {
+	Id int
+}

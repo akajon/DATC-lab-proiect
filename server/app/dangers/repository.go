@@ -33,3 +33,14 @@ func (r repositoryImpl) Create(ctx context.Context, category, name, description 
 
 	return &CreateDangerResponse{Id: id, Category: category, Name: name, Description: description, Grade: grade}, nil
 }
+
+func (r repositoryImpl) Delete(ctx context.Context, dangerId int) error {
+	err := r.db.PingContext(ctx)
+	if err != nil {
+		return err
+	}
+
+	_, err = r.db.ExecContext(ctx, "DELETE FROM dangers WHERE danger_id = @danger_id", sql.Named("danger_id", dangerId))
+
+	return err
+}
