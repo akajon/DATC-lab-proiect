@@ -34,6 +34,8 @@ func main() {
 	if err != nil {
 		log.Fatal("Error creating connection pool: ", err.Error())
 	}
+	
+	// verify connection
 	ctx := context.Background()
 	err = conn.PingContext(ctx)
 	if err != nil {
