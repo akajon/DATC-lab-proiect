@@ -5,3 +5,10 @@ category varchar(60) not null,
 name varchar(60) not null,
 description varchar(255) not null,
 grade int not null*/
+
+type CreateDangerRequest struct {
+	Category    string
+	Name        string
+	Description string
+	Grade       int
+}
