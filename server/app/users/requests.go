@@ -8,3 +8,14 @@ passw varchar(255) not null,
 tax_reduction int,
 rol varchar(50) not null,
 deletion_date date*/
+
+type CreateUserRequest struct {
+	FirstName string
+	LastName  string
+	Email     string
+	Password  string
+}
+
+type UpdateDeleteDateRequest struct {
+	Id int
+}
