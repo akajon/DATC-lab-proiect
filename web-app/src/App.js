@@ -4,8 +4,9 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Dashboard from './components/Dashboard/Dashboard';
 import Login from './components/Login/Login';
 
-function App() {
+import { GoogleMap, useJsApiLoader, useLoadScript, Marker } from "@react-google-maps/api"
 
+function App() {
   const [logged, setLogged] = useState(false);
 
   if(!logged) {

@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/76b13055-9325-48b3-8426-d291cfc66266/AppServices/subscriptions/76b13055-9325-48b3-8426-d291cfc66266/resourceGroups/appsvc_linux_centralus/providers/Microsoft.Web/sites/DATC-lab-project-webapp",
+    "appService.deploySubpath": "web-app"
+}
