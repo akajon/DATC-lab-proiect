@@ -6,10 +6,10 @@ import Login from './components/Login/Login';
 
 function App() {
 
-  const logged = useState();
+  const [logged, setLogged] = useState(false);
 
   if(!logged) {
-    return <Login setLogged={setLogged} />
+    return <Login logged={logged} setLogged={setLogged}/>
   }
 
   return (
