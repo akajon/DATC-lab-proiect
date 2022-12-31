@@ -3,3 +3,7 @@
     flex-direction: column;
     align-items: center;
 }
+
+/* table, th, td {
+    border: 1px none black;
+} */

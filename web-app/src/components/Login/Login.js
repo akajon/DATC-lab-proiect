@@ -28,6 +28,16 @@ export default function Login({ setToken, setLogged }) {
     setToken(token);
   }
 
+  const handleUserCreate = async e => {
+    console.log("clicked user create");
+    console.log(username);
+  }
+
+  const handleUserDelete = async e => {
+    console.log("clicked user delete");
+    console.log(password);
+  }
+
   return(
     <div className="login-wrapper">
       <h1>Please Log In</h1>
@@ -41,9 +51,32 @@ export default function Login({ setToken, setLogged }) {
           <input type="password" onChange={e => setPassword(e.target.value)}/>
         </label>
         <div>
-          <button type="submit">Submit</button>
+        <br/>
+          <button type="submit">Login</button>
         </div>
       </form>
+
+      <h2>Other Actions</h2>
+      <table>
+        <tbody>
+          <tr>
+            <td>
+              <form onSubmit={handleUserCreate}>
+                <div>
+                  <button type="button" onClick={handleUserCreate}>Create User</button>
+                </div>
+              </form>
+            </td>
+            <td>
+              <form onSubmit={handleUserDelete}>
+                <div>
+                  <button type="button" onClick={handleUserDelete}>Delete User</button>
+                </div>
+              </form>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   )
 }
