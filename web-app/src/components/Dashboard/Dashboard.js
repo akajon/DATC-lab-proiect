@@ -5,7 +5,7 @@ import CreateDangerModal from './../CreateDangerModal/CreateDangerModal'
 
 export default function Dashboard() {
 
-  var marker = new Marker(45.756745, 21.228737);
+  // var marker = new Marker(45.756745, 21.228737);
 
   const handleReportSubmit = (event) => {
     // setLogged(true);
@@ -23,8 +23,13 @@ export default function Dashboard() {
   
   return <div>
       <div>
-        <div>
-          <table  style={{align: "center", width: "90%", marginLeft: "5%"}}>
+        <div style={{textAlign: "center"}}>
+          <h1 >City Dangers Alert Project</h1>
+        </div>
+        <hr/>
+
+        <div style={{paddingTop: "2%"}}>
+          <table style={{align: "center", width: "96%", marginLeft: "2%"}}>
             <tbody>
               <tr>
                 <td colSpan="2" style={{textAlign: "center"}}>
@@ -57,20 +62,21 @@ export default function Dashboard() {
                   </form>
                 </td>
                 <td>
-                  <div id="map" style={{ height: '80vh', width: '100%' }}>
+                  <div id="map" style={{ height: '60vh', width: '100%' }}>
                     {Map(45.756745, 21.228737)}
                   </div>
                 </td>
               </tr>
             </tbody>
           </table>
+          <br/>
         </div>
       </div>
       <hr/>
       <br/>
 
       <div style={{textAlign: "center"}}>
-        <h2>Reported Dangers </h2>
+        <h2>Active Dangers </h2>
       </div>
 
       <table style={{width: '50%'}}>
@@ -90,25 +96,6 @@ export default function Dashboard() {
     </div>
 }
 
-function onClick(t, map, coord) {
-  const { latLng } = coord;
-  const lat = latLng.lat();
-  const lng = latLng.lng();
-
-  this.setState(previousState => {
-    return {
-      markers: [
-        ...previousState.markers,
-        {
-          title: "",
-          name: "",
-          position: { lat, lng }
-        }
-      ]
-    };
-  });
-}
-
 function Map(lattitude, longitude){
   const key="AIzaSyDg2UhWgxYuS6dZgb7KO-8H_0yM6xEeQk8";
   const {isLoaded} = useJsApiLoader({
@@ -120,12 +107,11 @@ function Map(lattitude, longitude){
   }
 
   return (
-    <div style={{ height: '80vh', width: '100%' }}>
+    <div style={{ height: '60vh', width: '100%' }}>
       <GoogleMap
         zoom={15}
         center={{lat: lattitude , lng: longitude}}
         mapContainerClassName="map-container"
-        // onClick={onClick}
       >
         <Marker
           key={lattitude}
