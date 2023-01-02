@@ -1,5 +1,6 @@
 SERVER=proiectdatc.database.windows.net
 PORT=1433
 USER=CloudSA35efb96b
-PASSWORD=<password>
+PASSWORD=password
 DATABASE=city_danger_alert
+JWTKEY=secretkey
