@@ -13,7 +13,7 @@ type repositoryImpl struct {
 	db *sql.DB
 }
 
-func (r repositoryImpl) Create(ctx context.Context, category, name, description string, grade int) (*CreateDangerResponse, error) {
+func (r repositoryImpl) Create(ctx context.Context, category, name, description string, grade int) error {
 	var id int
 
 	err := r.db.QueryRowContext(ctx, `INSERT INTO dbo.dangers (category, name, description, grade) OUTPUT inserted.danger_id
@@ -23,16 +23,12 @@ func (r repositoryImpl) Create(ctx context.Context, category, name, description 
 		sql.Named("description", description),
 		sql.Named("grade", grade)).Scan(&id)
 
-	if err != nil {
-		return nil, err
-	}
-
-	return &CreateDangerResponse{Id: id, Category: category, Name: name, Description: description, Grade: grade}, nil
+	return err
 }
 
 func (r repositoryImpl) Delete(ctx context.Context, dangerId int) error {
 
-	_, err := r.db.ExecContext(ctx, "DELETE FROM dangers WHERE danger_id = @danger_id", sql.Named("danger_id", dangerId))
+	_, err := r.db.ExecContext(ctx, "DELETE FROM dbo.dangers WHERE danger_id = @danger_id", sql.Named("danger_id", dangerId))
 
 	return err
 }

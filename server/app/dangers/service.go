@@ -3,7 +3,7 @@ package dangers
 import "context"
 
 type Repository interface {
-	Create(ctx context.Context, category, name, description string, grade int) (*CreateDangerResponse, error)
+	Create(ctx context.Context, category, name, description string, grade int) error
 	Delete(ctx context.Context, dangerId int) error
 }
 
@@ -15,7 +15,7 @@ type serviceImplementation struct {
 	repo Repository
 }
 
-func (s serviceImplementation) CreateDanger(ctx context.Context, category, name, description string, grade int) (*CreateDangerResponse, error) {
+func (s serviceImplementation) CreateDanger(ctx context.Context, category, name, description string, grade int) error {
 	return s.repo.Create(ctx, category, name, description, grade)
 }
 

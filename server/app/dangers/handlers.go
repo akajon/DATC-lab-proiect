@@ -3,28 +3,66 @@ package dangers
 import (
 	"context"
 	"encoding/json"
-	"github.com/gorilla/mux"
 	"log"
 	"net/http"
+	"os"
+
+	"github.com/golang-jwt/jwt/v4"
+	"github.com/gorilla/mux"
 )
 
 type Service interface {
-	CreateDanger(ctx context.Context, category, name, description string, grade int) (*CreateDangerResponse, error)
+	CreateDanger(ctx context.Context, category, name, description string, grade int) error
 	DeleteDanger(ctx context.Context, dangerId int) error
+}
+
+type Claims struct {
+	UserId   int
+	Username string
+	jwt.RegisteredClaims
 }
 
 // POSTCreateDanger create a danger
 func POSTCreateDanger(svc Service) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		c, err := r.Cookie("token")
+		if err != nil {
+			if err == http.ErrNoCookie {
+				w.WriteHeader(http.StatusUnauthorized)
+				return
+			}
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		tknStr := c.Value
+		claims := &Claims{}
+		tkn, err := jwt.ParseWithClaims(tknStr, claims, func(token *jwt.Token) (interface{}, error) {
+			return []byte(os.Getenv("JWTKEY")), nil
+		})
+
+		if err != nil {
+			if err == jwt.ErrSignatureInvalid {
+				w.WriteHeader(http.StatusUnauthorized)
+				return
+			}
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		if !tkn.Valid {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+
 		var danger CreateDangerRequest
 
-		err := json.NewDecoder(r.Body).Decode(&danger)
+		err = json.NewDecoder(r.Body).Decode(&danger)
 		if err != nil {
 			log.Print("POSTCreateDanger failed to decode")
 			return
 		}
 
-		createdDanger, err := svc.CreateDanger(r.Context(), danger.Category, danger.Name, danger.Description, danger.Grade)
+		err = svc.CreateDanger(r.Context(), danger.Category, danger.Name, danger.Description, danger.Grade)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			err = json.NewEncoder(w).Encode(err.Error())
@@ -36,20 +74,44 @@ func POSTCreateDanger(svc Service) http.Handler {
 		}
 
 		w.WriteHeader(http.StatusCreated)
-		err = json.NewEncoder(w).Encode(createdDanger)
-		if err != nil {
-			log.Print("POSTCreateDanger failed to encode")
-			return
-		}
 	})
 }
 
 // DELETEDanger delete a danger
 func DELETEDanger(svc Service) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		c, err := r.Cookie("token")
+		if err != nil {
+			if err == http.ErrNoCookie {
+				w.WriteHeader(http.StatusUnauthorized)
+				return
+			}
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		tknStr := c.Value
+		claims := &Claims{}
+		tkn, err := jwt.ParseWithClaims(tknStr, claims, func(token *jwt.Token) (interface{}, error) {
+			return []byte(os.Getenv("JWTKEY")), nil
+		})
+
+		if err != nil {
+			if err == jwt.ErrSignatureInvalid {
+				w.WriteHeader(http.StatusUnauthorized)
+				return
+			}
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		if !tkn.Valid {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+
 		var danger DeleteDangerRequest
 
-		err := json.NewDecoder(r.Body).Decode(&danger)
+		err = json.NewDecoder(r.Body).Decode(&danger)
 		if err != nil {
 			log.Print("DELETEDanger failed to decode")
 			return
@@ -65,8 +127,6 @@ func DELETEDanger(svc Service) http.Handler {
 			}
 			return
 		}
-
-		w.WriteHeader(http.StatusOK)
 	})
 }
 
