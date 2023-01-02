@@ -4,9 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"github.com/gorilla/mux"
-	"github.com/joho/godotenv"
-	_ "github.com/microsoft/go-mssqldb"
 	"log"
 	"net/http"
 	"os"
@@ -14,6 +11,10 @@ import (
 	"server/app/dangers"
 	"server/app/users"
 	"strconv"
+
+	"github.com/gorilla/mux"
+	"github.com/joho/godotenv"
+	_ "github.com/microsoft/go-mssqldb"
 )
 
 func main() {
@@ -34,14 +35,14 @@ func main() {
 	if err != nil {
 		log.Fatal("Error creating connection pool: ", err.Error())
 	}
-	
+
 	// verify connection
 	ctx := context.Background()
 	err = conn.PingContext(ctx)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
-	fmt.Printf("Connected!")
+	fmt.Printf("Database Connected!")
 	defer conn.Close()
 
 	// repositories
@@ -62,7 +63,7 @@ func main() {
 	alerts.RegisterRoutes(router, alertsService)
 
 	// run server
-	err = http.ListenAndServe("localhost:8080", router)
+	err = http.ListenAndServe("0.0.0.0:8081", router)
 	if err != nil {
 		log.Printf("error listening on port (port already in use?) : %#v", err)
 		return
