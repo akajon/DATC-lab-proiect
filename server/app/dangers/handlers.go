@@ -25,6 +25,7 @@ type Claims struct {
 // POSTCreateDanger create a danger
 func POSTCreateDanger(svc Service) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add("Access-Control-Allow-Origin", "*")
 		c, err := r.Cookie("token")
 		if err != nil {
 			if err == http.ErrNoCookie {
@@ -80,6 +81,7 @@ func POSTCreateDanger(svc Service) http.Handler {
 // DELETEDanger delete a danger
 func DELETEDanger(svc Service) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add("Access-Control-Allow-Origin", "*")
 		c, err := r.Cookie("token")
 		if err != nil {
 			if err == http.ErrNoCookie {

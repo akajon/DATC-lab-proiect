@@ -26,6 +26,7 @@ type Claims struct {
 
 func POSTAddAlert(svc Service) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add("Access-Control-Allow-Origin", "*")
 		c, err := r.Cookie("token")
 		if err != nil {
 			if err == http.ErrNoCookie {
