@@ -13,19 +13,44 @@ async function loginUser(credentials) {
     .then(data => data.json())
  }
 
-export default function Login({ setToken, setLogged }) {
+export default function Login({ setToken, setLogged, setUserType }) {
   const [username, setUserName] = useState();
   const [password, setPassword] = useState();
+  const [response, setResponse] = useState();
 
   const handleSubmit = async e => {
-    setLogged(true);
-    return;
+    // setLogged(true);
+    fetch('https://datcgoloverbackend.azurewebsites.net/signin', {
+      method: 'POST',
+      body: JSON.stringify({
+        username: username,
+        password: password
+      }),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+      .then(res => {
+        if (res.status === 200) {
+          // Handle successful response
+          setResponse(res);
+          setLogged(true);
+        } else {
+          // Handle error
+          console.error(res.statusText);
+        }
+      });
+    // return;
     e.preventDefault();
-    const token = await loginUser({
-      username,
-      password
-    });
-    setToken(token);
+    if (response.status === 200) {
+      // Handle successful response
+      return;
+    }
+    // const token = await loginUser({
+    //   username,
+    //   password
+    // });
+    // setToken(token);
   }
 
   const handleUserCreate = async e => {

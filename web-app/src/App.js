@@ -6,9 +6,10 @@ import Login from './components/Login/Login';
 
 function App() {
   const [logged, setLogged] = useState(false);
+  const [userType, setUserType] = React.useState(null);
 
   if(!logged) {
-    return <Login logged={logged} setLogged={setLogged}/>
+    return <Login logged={logged} setLogged={setLogged} setUserType={setUserType}/>
   }
 
   return (
