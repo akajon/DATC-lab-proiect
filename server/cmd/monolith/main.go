@@ -12,6 +12,7 @@ import (
 	"server/app/users"
 	"strconv"
 
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
 	_ "github.com/microsoft/go-mssqldb"
@@ -62,8 +63,13 @@ func main() {
 	dangers.RegisterRoutes(router, dangersService)
 	alerts.RegisterRoutes(router, alertsService)
 
+	// CORS
+	headers := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"})
+	methods := handlers.AllowedMethods([]string{"GET", "POST", "PUT", "HEAD", "OPTIONS"})
+	origins := handlers.AllowedOrigins([]string{"*"})
+
 	// run server
-	err = http.ListenAndServe("0.0.0.0:8081", router)
+	err = http.ListenAndServe("localhost:8081", handlers.CORS(headers, methods, origins)(router))
 	if err != nil {
 		log.Printf("error listening on port (port already in use?) : %#v", err)
 		return

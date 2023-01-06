@@ -14,7 +14,7 @@ type repositoryImpl struct {
 	db *sql.DB
 }
 
-func (r repositoryImpl) Create(ctx context.Context, firstName, lastName, email, hashedPassword, role string, taxReduction int, deletionDate *time.Time) error {
+func (r *repositoryImpl) Create(ctx context.Context, firstName, lastName, email, hashedPassword, role string, taxReduction int, deletionDate *time.Time) error {
 	var id int
 
 	err := r.db.QueryRowContext(ctx, `INSERT INTO dbo.users (first_name, last_name, email, passw, tax_reduction, rol, deletion_date) OUTPUT inserted.user_id
@@ -30,7 +30,7 @@ func (r repositoryImpl) Create(ctx context.Context, firstName, lastName, email, 
 	return err
 }
 
-func (r repositoryImpl) UpdateDeleteDate(ctx context.Context, userId int, deleteDate time.Time) error {
+func (r *repositoryImpl) UpdateDeleteDate(ctx context.Context, userId int, deleteDate time.Time) error {
 	_, err := r.db.ExecContext(ctx, `UPDATE dbo.users SET deletion_date = @deletion_date where user_id = @user_id`,
 		sql.Named("deletion_date", deleteDate),
 		sql.Named("user_id", userId))
@@ -38,7 +38,7 @@ func (r repositoryImpl) UpdateDeleteDate(ctx context.Context, userId int, delete
 	return err
 }
 
-func (r repositoryImpl) PasswordAndId(ctx context.Context, username string) (string, int, error) {
+func (r *repositoryImpl) PasswordAndId(ctx context.Context, username string) (string, int, error) {
 	var password string
 	var id int
 	err := r.db.QueryRowContext(ctx, `SELECT passw, user_id FROM dbo.users WHERE email = @email`, sql.Named("email", username)).Scan(&password, &id)

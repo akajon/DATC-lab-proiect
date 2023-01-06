@@ -5,3 +5,7 @@ type CreateAlertRequest struct {
 	Latitude  float32
 	Longitude float32
 }
+
+type DeleteAlertRequest struct {
+	Id int
+}

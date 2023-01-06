@@ -29,7 +29,6 @@ type Claims struct {
 // POSTCreateUser create user account
 func POSTCreateUser(svc Service) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Add("Access-Control-Allow-Origin", "*")
 		var user CreateUserRequest
 
 		err := json.NewDecoder(r.Body).Decode(&user)
@@ -56,7 +55,6 @@ func POSTCreateUser(svc Service) http.Handler {
 // PUTUpdateDeleteDate updates user deletion date (30 days from today) to be deleted by web job worker after 30days
 func PUTUpdateDeleteDate(svc Service) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Add("Access-Control-Allow-Origin", "*")
 		c, err := r.Cookie("token")
 		if err != nil {
 			if err == http.ErrNoCookie {
@@ -100,9 +98,8 @@ func PUTUpdateDeleteDate(svc Service) http.Handler {
 	})
 }
 
-func SignIn(svc Service) http.Handler {
+func POSTSignIn(svc Service) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Add("Access-Control-Allow-Origin", "*")
 		var creds Credentials
 
 		err := json.NewDecoder(r.Body).Decode(&creds)
@@ -150,5 +147,5 @@ func SignIn(svc Service) http.Handler {
 func RegisterRoutes(router *mux.Router, svc Service) {
 	router.Handle("/user/register", POSTCreateUser(svc)).Methods(http.MethodPost)
 	router.Handle("/user/delete", PUTUpdateDeleteDate(svc)).Methods(http.MethodPut)
-	router.Handle("/signin", SignIn(svc)).Methods(http.MethodPost)
+	router.Handle("/signin", POSTSignIn(svc)).Methods(http.MethodPost)
 }

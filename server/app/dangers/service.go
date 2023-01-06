@@ -15,10 +15,10 @@ type serviceImplementation struct {
 	repo Repository
 }
 
-func (s serviceImplementation) CreateDanger(ctx context.Context, category, name, description string, grade int) error {
+func (s *serviceImplementation) CreateDanger(ctx context.Context, category, name, description string, grade int) error {
 	return s.repo.Create(ctx, category, name, description, grade)
 }
 
-func (s serviceImplementation) DeleteDanger(ctx context.Context, dangerId int) error {
+func (s *serviceImplementation) DeleteDanger(ctx context.Context, dangerId int) error {
 	return s.repo.Delete(ctx, dangerId)
 }

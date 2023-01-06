@@ -13,9 +13,10 @@ import (
 )
 
 type Service interface {
-	VerifyAlert(ctx context.Context, dangerId int, latitude, longitude float32) (error, int)
+	VerifyAlert(ctx context.Context, dangerId int, latitude, longitude float32) (int, error)
 	CreateAlert(ctx context.Context, userId, dangerId int, latitude, longitude float32) error
 	AddUserToAlert(ctx context.Context, userId, alertId int) error
+	DeleteAlert(ctx context.Context, alertId int) error
 }
 
 type Claims struct {
@@ -26,7 +27,6 @@ type Claims struct {
 
 func POSTAddAlert(svc Service) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Add("Access-Control-Allow-Origin", "*")
 		c, err := r.Cookie("token")
 		if err != nil {
 			if err == http.ErrNoCookie {
@@ -62,7 +62,7 @@ func POSTAddAlert(svc Service) http.Handler {
 			return
 		}
 
-		err, alertId := svc.VerifyAlert(r.Context(), alert.DangerId, alert.Latitude, alert.Longitude)
+		alertId, err := svc.VerifyAlert(r.Context(), alert.DangerId, alert.Latitude, alert.Longitude)
 		if err != sql.ErrNoRows && err != nil {
 			fmt.Println(err)
 			w.WriteHeader(http.StatusInternalServerError)
@@ -83,6 +83,58 @@ func POSTAddAlert(svc Service) http.Handler {
 		err = svc.AddUserToAlert(r.Context(), claims.UserId, alertId)
 		if err != nil {
 			fmt.Println(err)
+			if err.Error() == "user already reported this alert" {
+				w.WriteHeader(http.StatusConflict)
+				json.NewEncoder(w).Encode(&struct{ Error string }{Error: err.Error()})
+				return
+			}
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+	})
+}
+
+func DELETEAlert(svc Service) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		c, err := r.Cookie("token")
+		if err != nil {
+			if err == http.ErrNoCookie {
+				w.WriteHeader(http.StatusUnauthorized)
+				return
+			}
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		tknStr := c.Value
+		claims := &Claims{}
+		tkn, err := jwt.ParseWithClaims(tknStr, claims, func(token *jwt.Token) (interface{}, error) {
+			return []byte(os.Getenv("JWTKEY")), nil
+		})
+
+		if err != nil {
+			if err == jwt.ErrSignatureInvalid {
+				w.WriteHeader(http.StatusUnauthorized)
+				return
+			}
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		if !tkn.Valid {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+
+		var alert DeleteAlertRequest
+
+		err = json.NewDecoder(r.Body).Decode(&alert)
+		if err != nil {
+			return
+		}
+
+		err = svc.DeleteAlert(r.Context(), alert.Id)
+		if err != nil {
+			fmt.Println(err)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
@@ -91,4 +143,5 @@ func POSTAddAlert(svc Service) http.Handler {
 
 func RegisterRoutes(router *mux.Router, svc Service) {
 	router.Handle("/alert/add", POSTAddAlert(svc)).Methods(http.MethodPost)
+	router.Handle("/alert/delete", DELETEAlert(svc)).Methods(http.MethodDelete)
 }

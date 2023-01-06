@@ -21,7 +21,7 @@ type serviceImplementation struct {
 	repo Repository
 }
 
-func (s serviceImplementation) CreateUser(ctx context.Context, firstName, lastName, email, password string) error {
+func (s *serviceImplementation) CreateUser(ctx context.Context, firstName, lastName, email, password string) error {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), 14)
 	if err != nil {
 		return err
@@ -31,10 +31,10 @@ func (s serviceImplementation) CreateUser(ctx context.Context, firstName, lastNa
 	return err
 }
 
-func (s serviceImplementation) UpdateDeleteDate(ctx context.Context, userId int) error {
+func (s *serviceImplementation) UpdateDeleteDate(ctx context.Context, userId int) error {
 	return s.repo.UpdateDeleteDate(ctx, userId, time.Now().AddDate(0, 1, 0))
 }
 
-func (s serviceImplementation) GetUserPasswordAndId(ctx context.Context, username string) (string, int, error) {
+func (s *serviceImplementation) GetUserPasswordAndId(ctx context.Context, username string) (string, int, error) {
 	return s.repo.PasswordAndId(ctx, username)
 }
