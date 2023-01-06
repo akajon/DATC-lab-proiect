@@ -9,22 +9,15 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/joho/godotenv"
 	_ "github.com/microsoft/go-mssqldb"
 )
 
 func main() {
-	//config
-	err := godotenv.Load(".env")
-	if err != nil {
-		log.Fatalf("Error loading .env file")
-	}
-
 	// database connection
 	// build connection string
 	port, _ := strconv.Atoi(os.Getenv("PORT"))
 	connString := fmt.Sprintf("server=%s;user id=%s;password=%s;port=%d;database=%s;",
-		os.Getenv("SERVER"), os.Getenv("USER"), os.Getenv("PASSWORD"), port, os.Getenv("DATABASE"))
+		"proiectdatc.database.windows.net", "CloudSA35efb96b", "22.dejlol", port, "city_danger_alert")
 
 	// create connection pool
 	conn, err := sql.Open("sqlserver", connString)
