@@ -48,3 +48,14 @@ func (r *repositoryImpl) PasswordAndId(ctx context.Context, username string) (st
 	}
 	return password, id, nil
 }
+
+func (r *repositoryImpl) Role(ctx context.Context, userId int) (string, error) {
+	var role string
+
+	err := r.db.QueryRowContext(ctx, `SELECT rol FROM dbo.users WHERE user_id = @user_id`, sql.Named("user_id", userId)).Scan(&role)
+	if err != nil {
+		return "", err
+	}
+
+	return role, nil
+}

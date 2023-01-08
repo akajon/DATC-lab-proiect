@@ -5,6 +5,7 @@ import "context"
 type Repository interface {
 	Create(ctx context.Context, category, name, description string, grade int) error
 	Delete(ctx context.Context, dangerId int) error
+	GetAll(ctx context.Context) ([]DangerGetResponse, error)
 }
 
 func NewService(repo Repository) Service {
@@ -13,6 +14,10 @@ func NewService(repo Repository) Service {
 
 type serviceImplementation struct {
 	repo Repository
+}
+
+func (s *serviceImplementation) GetDangers(ctx context.Context) ([]DangerGetResponse, error) {
+	return s.repo.GetAll(ctx)
 }
 
 func (s *serviceImplementation) CreateDanger(ctx context.Context, category, name, description string, grade int) error {

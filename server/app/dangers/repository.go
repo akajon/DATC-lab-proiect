@@ -32,3 +32,25 @@ func (r *repositoryImpl) Delete(ctx context.Context, dangerId int) error {
 
 	return err
 }
+
+func (r *repositoryImpl) GetAll(ctx context.Context) ([]DangerGetResponse, error) {
+	var dangers []DangerGetResponse
+
+	rows, err := r.db.QueryContext(ctx, `SELECT * FROM dbo.dangers`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var danger DangerGetResponse
+	for rows.Next() {
+		err := rows.Scan(&danger.Id, &danger.Category, &danger.Name, &danger.Description, &danger.Grade)
+		if err != nil {
+			return nil, err
+		}
+
+		dangers = append(dangers, danger)
+	}
+
+	return dangers, nil
+}

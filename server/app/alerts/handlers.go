@@ -17,11 +17,13 @@ type Service interface {
 	CreateAlert(ctx context.Context, userId, dangerId int, latitude, longitude float32) error
 	AddUserToAlert(ctx context.Context, userId, alertId int) error
 	DeleteAlert(ctx context.Context, alertId int) error
+	GetAlerts(ctx context.Context) ([]AlertGetResponse, error)
 }
 
 type Claims struct {
 	UserId   int
 	Username string
+	Role     string
 	jwt.RegisteredClaims
 }
 
@@ -125,6 +127,11 @@ func DELETEAlert(svc Service) http.Handler {
 			return
 		}
 
+		if claims.Role != "ADMIN" {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+
 		var alert DeleteAlertRequest
 
 		err = json.NewDecoder(r.Body).Decode(&alert)
@@ -141,7 +148,49 @@ func DELETEAlert(svc Service) http.Handler {
 	})
 }
 
+func GETAlerts(svc Service) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		c, err := r.Cookie("token")
+		if err != nil {
+			if err == http.ErrNoCookie {
+				w.WriteHeader(http.StatusUnauthorized)
+				return
+			}
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		tknStr := c.Value
+		claims := &Claims{}
+		tkn, err := jwt.ParseWithClaims(tknStr, claims, func(token *jwt.Token) (interface{}, error) {
+			return []byte(os.Getenv("JWTKEY")), nil
+		})
+
+		if err != nil {
+			if err == jwt.ErrSignatureInvalid {
+				w.WriteHeader(http.StatusUnauthorized)
+				return
+			}
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		if !tkn.Valid {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+
+		alerts, err := svc.GetAlerts(r.Context())
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		json.NewEncoder(w).Encode(&alerts)
+	})
+}
+
 func RegisterRoutes(router *mux.Router, svc Service) {
 	router.Handle("/alert/add", POSTAddAlert(svc)).Methods(http.MethodPost)
 	router.Handle("/alert/delete", DELETEAlert(svc)).Methods(http.MethodDelete)
+	router.Handle("/alert", GETAlerts(svc)).Methods(http.MethodGet)
 }

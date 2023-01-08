@@ -18,11 +18,13 @@ type Service interface {
 	CreateUser(ctx context.Context, firstName, lastName, email, password string) error
 	UpdateDeleteDate(ctx context.Context, userId int) error
 	GetUserPasswordAndId(ctx context.Context, username string) (string, int, error)
+	GetRole(ctx context.Context, userId int) (string, error)
 }
 
 type Claims struct {
 	UserId   int
 	Username string
+	Role     string
 	jwt.RegisteredClaims
 }
 
@@ -119,10 +121,17 @@ func POSTSignIn(svc Service) http.Handler {
 			return
 		}
 
+		role, err := svc.GetRole(r.Context(), userId)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
 		expirationTime := time.Now().Add(30 * time.Minute)
 		claims := &Claims{
 			UserId:   userId,
 			Username: creds.Username,
+			Role:     role,
 			RegisteredClaims: jwt.RegisteredClaims{
 				ExpiresAt: jwt.NewNumericDate(expirationTime),
 			},

@@ -11,6 +11,7 @@ type Repository interface {
 	Create(ctx context.Context, firstName, lastName, email, password, role string, taxReduction int, deletionDate *time.Time) error
 	UpdateDeleteDate(ctx context.Context, userId int, deleteDate time.Time) error
 	PasswordAndId(ctx context.Context, username string) (string, int, error)
+	Role(ctx context.Context, userId int) (string, error)
 }
 
 func NewService(repo Repository) Service {
@@ -19,6 +20,10 @@ func NewService(repo Repository) Service {
 
 type serviceImplementation struct {
 	repo Repository
+}
+
+func (s *serviceImplementation) GetRole(ctx context.Context, userId int) (string, error) {
+	return s.repo.Role(ctx, userId)
 }
 
 func (s *serviceImplementation) CreateUser(ctx context.Context, firstName, lastName, email, password string) error {

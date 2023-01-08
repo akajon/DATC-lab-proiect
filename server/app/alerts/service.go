@@ -15,6 +15,7 @@ type Repository interface {
 	RewardUser(ctx context.Context, userId, taxReduction int) error
 	Get(ctx context.Context, alertId int) (*AlertReward, error)
 	GetDangerGrade(ctx context.Context, dangerId int) (int, error)
+	GetAll(ctx context.Context) ([]AlertGetResponse, error)
 }
 
 func NewService(repo Repository) Service {
@@ -96,4 +97,8 @@ func (s *serviceImplementation) AddUserToAlert(ctx context.Context, userId, aler
 	}
 
 	return s.repo.AddUser(ctx, userId, alertId)
+}
+
+func (s *serviceImplementation) GetAlerts(ctx context.Context) ([]AlertGetResponse, error) {
+	return s.repo.GetAll(ctx)
 }

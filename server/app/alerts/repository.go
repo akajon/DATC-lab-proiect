@@ -76,3 +76,26 @@ func (r *repositoryImpl) AddUser(ctx context.Context, userId, alertId int) error
 
 	return err
 }
+
+func (r *repositoryImpl) GetAll(ctx context.Context) ([]AlertGetResponse, error) {
+	var alerts []AlertGetResponse
+
+	rows, err := r.db.QueryContext(ctx, `SELECT * FROM dbo.alerts`)
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	var alert AlertGetResponse
+	for rows.Next() {
+		err := rows.Scan(&alert.Id, &alert.OwnerId, &alert.DangerId, &alert.Users, &alert.Latitude, &alert.Longitude, &alert.Date)
+		if err != nil {
+			return nil, err
+		}
+
+		alerts = append(alerts, alert)
+	}
+
+	return alerts, nil
+}
