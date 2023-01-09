@@ -64,12 +64,13 @@ func main() {
 	alerts.RegisterRoutes(router, alertsService)
 
 	// CORS
-	headers := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"})
+	headers := handlers.AllowedHeaders([]string{"Content-Type"})
 	methods := handlers.AllowedMethods([]string{"GET", "POST", "PUT", "HEAD", "OPTIONS"})
 	origins := handlers.AllowedOrigins([]string{"*"})
+	credentials := handlers.AllowCredentials()
 
 	// run server
-	err = http.ListenAndServe("localhost:8081", handlers.CORS(headers, methods, origins)(router))
+	err = http.ListenAndServe("0.0.0.0:8081", handlers.CORS(headers, methods, origins, credentials)(router))
 	if err != nil {
 		log.Printf("error listening on port (port already in use?) : %#v", err)
 		return
