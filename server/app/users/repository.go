@@ -63,6 +63,7 @@ func (r *repositoryImpl) Role(ctx context.Context, userId int) (string, error) {
 func (r *repositoryImpl) Get(ctx context.Context, userId int) (*SignInResponse, error) {
 	var user SignInResponse
 
+	user.Id = userId
 	err := r.db.QueryRowContext(ctx, `SELECT first_name, last_name, email, tax_reduction, rol FROM dbo.users WHERE user_id = @user_id`, sql.Named("user_id", userId)).
 		Scan(&user.FirstName, &user.LastName, &user.Email, &user.TaxReduction, &user.Role)
 	if err != nil {

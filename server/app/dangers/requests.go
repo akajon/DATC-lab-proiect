@@ -5,7 +5,9 @@ type CreateDangerRequest struct {
 	Name        string
 	Description string
 	Grade       int
+	UserRole    string
 }
 type DeleteDangerRequest struct {
-	Id int
+	Id       int
+	UserRole string
 }
