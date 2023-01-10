@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import './Login.css';
 import PropTypes from 'prop-types';
+import jwt from 'jwt-decode';
+import Cookies from 'js-cookie';
 
 async function loginUser(credentials) {
-  return fetch('http://localhost:8080/login', {
+  return fetch('localhost:8081/login', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -13,13 +15,12 @@ async function loginUser(credentials) {
     .then(data => data.json())
  }
 
-export default function Login({ setToken, setLogged, setUserType }) {
+export default function Login({ setToken, setLogged, setUser }) {
   const [username, setUserName] = useState();
   const [password, setPassword] = useState();
   const [response, setResponse] = useState();
 
   const handleSubmit = async e => {
-    // setLogged(true);
     fetch('https://datcgoloverbackend.azurewebsites.net/signin', {
       method: 'POST',
       body: JSON.stringify({
@@ -31,26 +32,20 @@ export default function Login({ setToken, setLogged, setUserType }) {
       }
     })
       .then(res => {
+        
+        // console.log(res.text());
         if (res.status === 200) {
-          // Handle successful response
+          // const token = res.data.token;
+          // setToken(jwt(token));
+          // console.log(res);
           setResponse(res);
+          setUser(res.json());
           setLogged(true);
         } else {
-          // Handle error
           console.error(res.statusText);
         }
       });
-    // return;
     e.preventDefault();
-    if (response.status === 200) {
-      // Handle successful response
-      return;
-    }
-    // const token = await loginUser({
-    //   username,
-    //   password
-    // });
-    // setToken(token);
   }
 
   const handleUserCreate = async e => {

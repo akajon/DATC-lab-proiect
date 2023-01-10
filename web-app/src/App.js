@@ -3,23 +3,26 @@ import './App.css';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Dashboard from './components/Dashboard/Dashboard';
 import Login from './components/Login/Login';
+import Register from './components/Register/Register';
 
 function App() {
   const [logged, setLogged] = useState(false);
-  const [userType, setUserType] = React.useState(null);
+  const [user, setUser] = React.useState(null);
 
   if(!logged) {
-    return <Login logged={logged} setLogged={setLogged} setUserType={setUserType}/>
+    return <Login setLogged={setLogged} setUser={setUser}/>
   }
 
   return (
-    <div className="wrapper">
-      <BrowserRouter>
-        <Routes>
-          <Route path="/dashboard" element={<Dashboard/>} />
-        </Routes>
-      </BrowserRouter>
-    </div>
+    <Dashboard user={user}/>
+    // <div className="wrapper">
+    //   <BrowserRouter>
+    //     <Routes>
+    //       <Route path="/dashboard" element={<Dashboard/>} />
+    //       <Route path="/register" element={<Register/>} />
+    //     </Routes>
+    //   </BrowserRouter>
+    // </div>
   );
 }
 
