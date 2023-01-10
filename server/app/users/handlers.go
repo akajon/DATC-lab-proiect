@@ -19,6 +19,7 @@ type Service interface {
 	UpdateDeleteDate(ctx context.Context, userId int) error
 	GetUserPasswordAndId(ctx context.Context, username string) (string, int, error)
 	GetRole(ctx context.Context, userId int) (string, error)
+	GetUser(ctx context.Context, userId int) (*SignInResponse, error)
 }
 
 type Claims struct {
@@ -57,7 +58,7 @@ func POSTCreateUser(svc Service) http.Handler {
 // PUTUpdateDeleteDate updates user deletion date (30 days from today) to be deleted by web job worker after 30days
 func PUTUpdateDeleteDate(svc Service) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		c, err := r.Cookie("token")
+		/* c, err := r.Cookie("token")
 		if err != nil {
 			if err == http.ErrNoCookie {
 				w.WriteHeader(http.StatusUnauthorized)
@@ -85,9 +86,10 @@ func PUTUpdateDeleteDate(svc Service) http.Handler {
 		if !tkn.Valid {
 			w.WriteHeader(http.StatusUnauthorized)
 			return
-		}
+		} */
 
-		err = svc.UpdateDeleteDate(r.Context(), claims.UserId)
+		var userId UserId
+		err := svc.UpdateDeleteDate(r.Context(), userId.Id)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			err = json.NewEncoder(w).Encode(err.Error())
@@ -150,6 +152,21 @@ func POSTSignIn(svc Service) http.Handler {
 			Value:   tokenString,
 			Expires: expirationTime,
 		})
+
+		// TODO: Put nil on user deletion_date if ithas a date set
+		user, err := svc.GetUser(r.Context(), userId)
+		if err != nil {
+			fmt.Println(err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		err = json.NewEncoder(w).Encode(&user)
+		if err != nil {
+			fmt.Println(err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
 	})
 }
 

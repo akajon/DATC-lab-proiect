@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"os"
 
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/gorilla/mux"
@@ -29,7 +28,7 @@ type Claims struct {
 
 func POSTAddAlert(svc Service) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		c, err := r.Cookie("token")
+		/* c, err := r.Cookie("token")
 		if err != nil {
 			if err == http.ErrNoCookie {
 				w.WriteHeader(http.StatusUnauthorized)
@@ -56,10 +55,10 @@ func POSTAddAlert(svc Service) http.Handler {
 		if !tkn.Valid {
 			w.WriteHeader(http.StatusUnauthorized)
 			return
-		}
+		} */
 
 		var alert CreateAlertRequest
-		err = json.NewDecoder(r.Body).Decode(&alert)
+		err := json.NewDecoder(r.Body).Decode(&alert)
 		if err != nil {
 			return
 		}
@@ -72,7 +71,7 @@ func POSTAddAlert(svc Service) http.Handler {
 		}
 
 		if alertId == 0 {
-			err := svc.CreateAlert(r.Context(), claims.UserId, alert.DangerId, alert.Latitude, alert.Longitude)
+			err := svc.CreateAlert(r.Context(), alert.UserId, alert.DangerId, alert.Latitude, alert.Longitude)
 			if err != nil {
 				fmt.Println(err)
 				w.WriteHeader(http.StatusInternalServerError)
@@ -82,7 +81,7 @@ func POSTAddAlert(svc Service) http.Handler {
 			return
 		}
 
-		err = svc.AddUserToAlert(r.Context(), claims.UserId, alertId)
+		err = svc.AddUserToAlert(r.Context(), alert.UserId, alertId)
 		if err != nil {
 			fmt.Println(err)
 			if err.Error() == "user already reported this alert" {
@@ -98,7 +97,7 @@ func POSTAddAlert(svc Service) http.Handler {
 
 func DELETEAlert(svc Service) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		c, err := r.Cookie("token")
+		/* c, err := r.Cookie("token")
 		if err != nil {
 			if err == http.ErrNoCookie {
 				w.WriteHeader(http.StatusUnauthorized)
@@ -125,17 +124,17 @@ func DELETEAlert(svc Service) http.Handler {
 		if !tkn.Valid {
 			w.WriteHeader(http.StatusUnauthorized)
 			return
-		}
-
-		if claims.Role != "ADMIN" {
-			w.WriteHeader(http.StatusUnauthorized)
-			return
-		}
+		} */
 
 		var alert DeleteAlertRequest
 
-		err = json.NewDecoder(r.Body).Decode(&alert)
+		err := json.NewDecoder(r.Body).Decode(&alert)
 		if err != nil {
+			return
+		}
+
+		if alert.UserRole != "ADMIN" {
+			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
 
@@ -150,7 +149,7 @@ func DELETEAlert(svc Service) http.Handler {
 
 func GETAlerts(svc Service) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		c, err := r.Cookie("token")
+		/* c, err := r.Cookie("token")
 		if err != nil {
 			if err == http.ErrNoCookie {
 				w.WriteHeader(http.StatusUnauthorized)
@@ -177,7 +176,7 @@ func GETAlerts(svc Service) http.Handler {
 		if !tkn.Valid {
 			w.WriteHeader(http.StatusUnauthorized)
 			return
-		}
+		} */
 
 		alerts, err := svc.GetAlerts(r.Context())
 		if err != nil {

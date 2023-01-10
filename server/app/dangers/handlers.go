@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/gorilla/mux"
@@ -28,7 +27,7 @@ type Claims struct {
 // POSTCreateDanger create a danger
 func POSTCreateDanger(svc Service) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		c, err := r.Cookie("token")
+		/* c, err := r.Cookie("token")
 		if err != nil {
 			if err == http.ErrNoCookie {
 				w.WriteHeader(http.StatusUnauthorized)
@@ -55,18 +54,18 @@ func POSTCreateDanger(svc Service) http.Handler {
 		if !tkn.Valid {
 			w.WriteHeader(http.StatusUnauthorized)
 			return
-		}
-
-		if claims.Role != "ADMIN" {
-			w.WriteHeader(http.StatusUnauthorized)
-			return
-		}
+		} */
 
 		var danger CreateDangerRequest
 
-		err = json.NewDecoder(r.Body).Decode(&danger)
+		err := json.NewDecoder(r.Body).Decode(&danger)
 		if err != nil {
 			log.Print("POSTCreateDanger failed to decode")
+			return
+		}
+
+		if danger.UserRole != "ADMIN" {
+			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
 
@@ -88,7 +87,7 @@ func POSTCreateDanger(svc Service) http.Handler {
 // DELETEDanger delete a danger
 func DELETEDanger(svc Service) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		c, err := r.Cookie("token")
+		/* c, err := r.Cookie("token")
 		if err != nil {
 			if err == http.ErrNoCookie {
 				w.WriteHeader(http.StatusUnauthorized)
@@ -115,18 +114,18 @@ func DELETEDanger(svc Service) http.Handler {
 		if !tkn.Valid {
 			w.WriteHeader(http.StatusUnauthorized)
 			return
-		}
-
-		if claims.Role != "ADMIN" {
-			w.WriteHeader(http.StatusUnauthorized)
-			return
-		}
+		} */
 
 		var danger DeleteDangerRequest
 
-		err = json.NewDecoder(r.Body).Decode(&danger)
+		err := json.NewDecoder(r.Body).Decode(&danger)
 		if err != nil {
 			log.Print("DELETEDanger failed to decode")
+			return
+		}
+
+		if danger.UserRole != "ADMIN" {
+			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
 
@@ -145,7 +144,7 @@ func DELETEDanger(svc Service) http.Handler {
 
 func GETDangers(svc Service) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		c, err := r.Cookie("token")
+		/* c, err := r.Cookie("token")
 		if err != nil {
 			if err == http.ErrNoCookie {
 				w.WriteHeader(http.StatusUnauthorized)
@@ -172,7 +171,7 @@ func GETDangers(svc Service) http.Handler {
 		if !tkn.Valid {
 			w.WriteHeader(http.StatusUnauthorized)
 			return
-		}
+		} */
 
 		dangers, err := svc.GetDangers(r.Context())
 		if err != nil {

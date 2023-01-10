@@ -12,6 +12,7 @@ type Repository interface {
 	UpdateDeleteDate(ctx context.Context, userId int, deleteDate time.Time) error
 	PasswordAndId(ctx context.Context, username string) (string, int, error)
 	Role(ctx context.Context, userId int) (string, error)
+	Get(ctx context.Context, userId int) (*SignInResponse, error)
 }
 
 func NewService(repo Repository) Service {
@@ -42,4 +43,8 @@ func (s *serviceImplementation) UpdateDeleteDate(ctx context.Context, userId int
 
 func (s *serviceImplementation) GetUserPasswordAndId(ctx context.Context, username string) (string, int, error) {
 	return s.repo.PasswordAndId(ctx, username)
+}
+
+func (s *serviceImplementation) GetUser(ctx context.Context, userId int) (*SignInResponse, error) {
+	return s.repo.Get(ctx, userId)
 }

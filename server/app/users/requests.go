@@ -11,3 +11,7 @@ type Credentials struct {
 	Password string
 	Username string
 }
+
+type UserId struct {
+	Id int
+}
